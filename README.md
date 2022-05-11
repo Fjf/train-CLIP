@@ -2,6 +2,10 @@
 
 A PyTorch Lightning solution to training CLIP from both scratch and fine-tuning.
  
+## READ BEFORE INSTALLING
+
+To run this on AMD GPUs, build and install your own torch before installing the requirements from the requirements.txt
+
 ## Usage 🚂
 
 ### From Scratch 🌵

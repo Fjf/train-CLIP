@@ -108,12 +108,12 @@ class CLIPWrapper(pl.LightningModule):
         lr_scheduler.step()
         self.model.logit_scale.data.clamp_(-np.log(100), np.log(100))
 
-    def validation_step(self, val_batch, idx):
-        image, text = val_batch
-        image_logits, text_logits = self.forward(image, text)
-        ground_truth = torch.arange(len(image_logits))
-        loss = (F.cross_entropy(image_logits, ground_truth) + F.cross_entropy(text_logits, ground_truth)).div(2)
-        self.log('val_loss', loss)
+    # def validation_step(self, val_batch, idx):
+    #     image, text = val_batch
+    #     image_logits, text_logits = self.forward(image, text)
+    #     ground_truth = torch.arange(len(image_logits))
+    #     loss = (F.cross_entropy(image_logits, ground_truth) + F.cross_entropy(text_logits, ground_truth)).div(2)
+    #     self.log('val_loss', loss)
 
     def configure_optimizers(self):
         lr = {
@@ -141,13 +141,17 @@ class CLIPWrapper(pl.LightningModule):
 
         # Source: https://github.com/openai/CLIP/issues/107
         # Use pip install 'git+https://github.com/katsura-jp/pytorch-cosine-annealing-with-warmup'
-        lr_scheduler = CosineAnnealingWarmupRestarts(
+        # lr_scheduler = CosineAnnealingWarmupRestarts(
+        #     optimizer,
+        #     first_cycle_steps=200,
+        #     cycle_mult=1.0,
+        #     max_lr=lr,
+        #     min_lr=0,
+        #     warmup_steps=2000
+        # )
+        lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
             optimizer,
-            first_cycle_steps=self.num_training_steps,
-            cycle_mult=1.0,
-            max_lr=lr,
-            min_lr=0,
-            warmup_steps=2000
+            T_0=500
         )
 
         return {'optimizer': optimizer, 'lr_scheduler': lr_scheduler}
